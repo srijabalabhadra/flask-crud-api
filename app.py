@@ -33,15 +33,49 @@ def test():
 def create_user():
     try:
         data = request.get_json()
-        if not data or "username" not in data or "email" not in data:
-            return make_response(jsonify({"message": "username and email are required"}), 400)
 
-        new_user = User(username=data["username"], email=data["email"])
+        # Check whether data was provided
+        if not data:
+            return make_response(
+                jsonify({"message": "request body is required"}), 400
+            )
+
+        # Get username and email
+        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
+
+        # Check for empty username
+        if not username:
+            return make_response(
+                jsonify({"message": "username is required"}), 400
+            )
+
+        # Check for empty email
+        if not email:
+            return make_response(
+                jsonify({"message": "email is required"}), 400
+            )
+
+        # Simple email validation
+        if "@" not in email:
+            return make_response(
+                jsonify({"message": "invalid email format"}), 400
+            )
+
+        # Create new user
+        new_user = User(username=username, email=email)
+
         db.session.add(new_user)
         db.session.commit()
-        return make_response(jsonify({"message": "user created"}), 201)
+
+        return make_response(
+            jsonify({"message": "user created"}), 201
+        )
+
     except Exception:
-        return make_response(jsonify({"message": "error creating user"}), 500)
+        return make_response(
+            jsonify({"message": "error creating user"}), 500
+        )
 
 
 @app.route("/users", methods=["GET"])
