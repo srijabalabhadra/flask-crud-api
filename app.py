@@ -28,7 +28,6 @@ with app.app_context():
 def test():
     return make_response(jsonify({"message": "test route"}), 200)
 
-
 @app.route("/users", methods=["POST"])
 def create_user():
     try:
@@ -68,8 +67,13 @@ def create_user():
         db.session.add(new_user)
         db.session.commit()
 
+        # Return the newly created user
         return make_response(
-            jsonify({"message": "user created"}), 201
+            jsonify({
+                "message": "user created",
+                "user": new_user.json()
+            }),
+            201
         )
 
     except Exception:
