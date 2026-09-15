@@ -113,8 +113,25 @@ def update_user(id):
         if not data:
             return make_response(jsonify({"message": "no data provided"}), 400)
 
-        user.username = data.get("username", user.username)
-        user.email = data.get("email", user.email)
+        username = data.get("username", user.username).strip()
+        email = data.get("email", user.email).strip()
+
+        if not username:
+            return make_response(
+                jsonify({"message": "username cannot be empty"}), 400
+            )
+
+        if not email:
+            return make_response(
+                jsonify({"message": "email cannot be empty"}), 400
+            )
+
+        if "@" not in email:
+            return make_response(
+                jsonify({"message": "invalid email format"}), 400
+            )
+        user.username = username
+        user.email = email
         db.session.commit()
         return make_response(jsonify({"message": "user updated"}), 200)
     except Exception:
